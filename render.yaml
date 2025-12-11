@@ -1,13 +1,17 @@
+# render.yaml - CORRECTED VERSION
 services:
   - type: web
     name: tts-bot
     env: python
-    region: oregon  # or singapore, frankfurt, etc.
-    plan: free  # or starter, standard, pro
+    region: singapore  # or oregon, frankfurt, ohio
+    plan: free
     buildCommand: |
+      apt-get update
+      apt-get install -y ffmpeg
+      pip install --upgrade pip
       pip install -r requirements.txt
-      # Install FFmpeg for Render
-      apt-get update && apt-get install -y ffmpeg
+      mkdir -p data logs uploads
+      chmod 755 data logs uploads
     startCommand: python -m app.main
     healthCheckPath: /health
     autoDeploy: true
@@ -22,16 +26,11 @@ services:
         value: admin
       - key: ADMIN_PASSWORD
         sync: false
-      - key: DATABASE_URL
-        value: sqlite:///./data/tts_bot.db
+      - key: PORT
+        value: 8000
       - key: LOG_LEVEL
         value: INFO
       - key: DEBUG
         value: false
-
-# Create build directory structure
-builds:
-  - name: tts-bot-build
-    buildCommand: |
-      mkdir -p data logs uploads
-      chmod 755 data logs uploads
+      - key: PYTHON_VERSION
+        value: 3.11.0
